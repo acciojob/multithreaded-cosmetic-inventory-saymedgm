@@ -9,17 +9,20 @@ public class CosmeticInventory {
     private final AtomicInteger totalQuantity;
 
     public CosmeticInventory() {
-    	this.cosmetics = new ConcurrentHashMap<>();
+        this.cosmetics = new ConcurrentHashMap<>();
         this.totalQuantity = new AtomicInteger(0);
     }
 
     public void updateQuantity(String cosmeticType, int quantityChange) {
-    	// your code goes here
+        cosmetics.computeIfAbsent(cosmeticType, key -> new AtomicInteger(0)); // initialize if not present
+
+        // use AtomicInteger for thread-safe increment/decrement
+        cosmetics.get(cosmeticType).addAndGet(quantityChange);
+        totalQuantity.addAndGet(quantityChange);
     }
 
     public int getTotalQuantity() {
-    	// your code goes here
-        return totalQuantity.get();
+        return totalQuantity.get(); // Atomic integer guarantees consistent read
     }
 
     public static void main(String[] args) {
@@ -53,4 +56,3 @@ public class CosmeticInventory {
         System.out.println("Total Cosmetic Quantity: " + inventory.getTotalQuantity());
     }
 }
-
